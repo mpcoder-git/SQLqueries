@@ -1,0 +1,38 @@
+select ta.tov_kod,  od.o_name, ta.tov_n,  tb.md as mduhod,  tbp.md as mdprihod, ta.tov_kolvo
+from tov_all ta
+join otdel od on od.o_kod=ta.tov_kodotd
+join
+(
+  select m_tovkod as tov_kod,  max(m_nodate) as md
+  from move mvv
+  where (m_opname='продажа') or (m_opname='на сборку') or (m_opname='на разбор') or
+  (m_opname='расход') or (m_opname='на мехобр') or (m_opname='узл.сборка' and m_out>0)
+
+  group by m_tovkod
+) tb on tb.tov_kod = ta.tov_kod
+
+join
+(
+  select m_tovkod as tov_kod,  max(m_nodate) as md
+  from move mvv
+  where (m_opname='покупка') or (m_opname='со сборки') or (m_opname='с разбора') or
+  (m_opname='приход') or (m_opname='с мехобр') or (m_opname='узл.сборка' and m_in >0)
+
+  group by m_tovkod
+) tbp on tbp.tov_kod = ta.tov_kod
+
+where
+(
+12 - extract(month from tb.md) +
+(   extract(year from (SELECT Cast('NOW' as Date) FROM RDB$DATABASE)) - (extract(year from tb.md)+1))   *12 +
+extract(month from (SELECT Cast('NOW' as Date) FROM RDB$DATABASE))
+) >= 24 and
+(
+12 - extract(month from tbp.md) +
+(   extract(year from (SELECT Cast('NOW' as Date) FROM RDB$DATABASE)) - (extract(year from tbp.md)+1))   *12 +
+extract(month from (SELECT Cast('NOW' as Date) FROM RDB$DATABASE))
+) >= 24 and
+
+
+ta.tov_kolvo > 0
+order by ta.tov_kodotd, ta.tov_kod
