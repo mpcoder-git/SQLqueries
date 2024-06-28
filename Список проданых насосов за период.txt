@@ -1,0 +1,94 @@
+select od.ord_kod, od.ord_nds, od.ord_itog , ta.tov_kod, ta.tov_n, dd.d_kolzak, dd.d_discount, dd.d_prices, coalesce(df.df_nds,0) as dfnds,
+(
+    select sum(py.pay_sum) from pay py where py.pay_kodord = od.ord_kod
+    and py.pay_date >= '01.06.2024' and py.pay_date <= '30.06.2024'
+    and
+    (
+        py.pay_pldok like ('%0%') or py.pay_pldok like ('%1%') or py.pay_pldok like ('%2%') or
+        py.pay_pldok like ('%3%') or py.pay_pldok like ('%4%') or py.pay_pldok like ('%5%') or
+        py.pay_pldok like ('%6%') or py.pay_pldok like ('%7%') or py.pay_pldok like ('%8%') or
+        py.pay_pldok like ('%9%')
+    )
+) as sumpays
+from orders od
+join deal dd on dd.d_kodord = od.ord_kod and od.ord_kodop = 2  and od.ord_kodsell in (2,206,212,251,276,286)
+join price pr on pr.p_kod = dd.d_kodpr
+left join docsfields df on df.df_koddeal = dd.d_kod
+join tov_all ta on ta.tov_kod = pr.p_kodtov
+
+and
+(
+    (
+        ta.tov_n like ('%Насос %') or
+        ta.tov_n like ('%Насосный %')
+    )
+and
+    (
+        ta.tov_n like ('% ПФ_%') or ta.tov_n like ('% ПД_%') or
+        ta.tov_n like ('% ПФС_%') or ta.tov_n like ('% ПШ_%')
+
+    )
+)
+where
+(
+    select sum(py.pay_sum) from pay py where py.pay_kodord = od.ord_kod
+    and py.pay_date >= '01.06.2024' and py.pay_date <= '30.06.2024'
+    and
+    (
+        py.pay_pldok like ('%0%') or py.pay_pldok like ('%1%') or py.pay_pldok like ('%2%') or
+        py.pay_pldok like ('%3%') or py.pay_pldok like ('%4%') or py.pay_pldok like ('%5%') or
+        py.pay_pldok like ('%6%') or py.pay_pldok like ('%7%') or py.pay_pldok like ('%8%') or
+        py.pay_pldok like ('%9%')
+    )
+) > 0
+
+union all
+
+
+select od.ord_kod, od.ord_nds, od.ord_itog , ta.tov_kod, ta.tov_n, dd.d_kolzak, dd.d_discount, dd.d_prices, coalesce(df.df_nds,0) as dfnds,
+(
+    select sum(py.pay_sum) from pay py where py.pay_kodord = od.ord_kod
+    and py.pay_date >= '01.06.2024' and py.pay_date <= '30.06.2024'
+    and
+    (
+        py.pay_pldok like ('%0%') or py.pay_pldok like ('%1%') or py.pay_pldok like ('%2%') or
+        py.pay_pldok like ('%3%') or py.pay_pldok like ('%4%') or py.pay_pldok like ('%5%') or
+        py.pay_pldok like ('%6%') or py.pay_pldok like ('%7%') or py.pay_pldok like ('%8%') or
+        py.pay_pldok like ('%9%')
+    )
+) as sumpays
+from orders od
+join deal dd on dd.d_kodord = od.ord_kod and od.ord_kodop = 2  and od.ord_kodsell in (2,206,212,251,276,286)
+join price pr on pr.p_kod = dd.d_kodpr
+left join docsfields df on df.df_koddeal = dd.d_kod
+join tov_all ta on ta.tov_kod = pr.p_kodtov
+
+and
+(
+    (
+        ta.tov_n like ('%Насос %') or
+        ta.tov_n like ('%Насосный %')
+    )
+and
+    (
+        ta.tov_n like ('% Р_%') or ta.tov_n like ('% Р__%') or ta.tov_n like ('% Р___%')
+
+    )
+and
+    (
+        ta.tov_n not like ('%ручной%')
+    )
+
+)
+where
+(
+    select sum(py.pay_sum) from pay py where py.pay_kodord = od.ord_kod
+    and py.pay_date >= '01.06.2024' and py.pay_date <= '30.06.2024'
+    and
+    (
+        py.pay_pldok like ('%0%') or py.pay_pldok like ('%1%') or py.pay_pldok like ('%2%') or
+        py.pay_pldok like ('%3%') or py.pay_pldok like ('%4%') or py.pay_pldok like ('%5%') or
+        py.pay_pldok like ('%6%') or py.pay_pldok like ('%7%') or py.pay_pldok like ('%8%') or
+        py.pay_pldok like ('%9%')
+    )
+) > 0
