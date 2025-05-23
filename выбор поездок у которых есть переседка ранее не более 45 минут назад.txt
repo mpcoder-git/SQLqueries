@@ -1,0 +1,31 @@
+with temp_tb as 
+(
+select   op.CODE as operator, dv.CODE as division, rt.code as n_marshruta, td.DATE_OF,  td.kind, td.CARD_NUM, td.amount,
+ td.ID_TRAVEL_ZONE_BEGIN,rt_begin.CODE as code_begin,  td.ID_TRAVEL_ZONE_END, rt_end.CODE as code_end
+from operator op
+join division dv on dv.ID_OPERATOR = op.ID
+join t_data td on td.ID_DIVISION = dv.ID
+join route rt on rt.ID = td.ID_ROUTE
+join route_zone rt_begin on rt_begin.ID = td.ID_TRAVEL_ZONE_BEGIN
+join route_zone rt_end on rt_end.ID = td.ID_TRAVEL_ZONE_END
+
+where op.CODE = '0102' and dv.CODE = '0122'
+and td.DATE_OF >= '01.04.2025' and td.DATE_OF <= '30.04.2025'
+and nvl(new_card_series, card_series) in (99)
+and td.kind in (16)
+and (rt_begin.CODE = '02'  and rt_end.CODE != '02') 
+--and td.AMOUNT  = 0
+) 
+
+select n_marshruta, 
+count(cnt)
+from
+(
+    select n_marshruta, card_num,
+    (select count(*) from temp_tb t2 where t2.card_num = ttb.card_num and t2.date_of < ttb.date_of and ((ttb.date_of - t2.date_of) * 24 * 60) <= 45  and t2.n_marshruta != ttb.n_marshruta and t2.AMOUNT  = 0) as cnt
+
+    from temp_tb ttb
+    where 
+    (select count(*) from temp_tb t2 where t2.card_num = ttb.card_num and t2.date_of < ttb.date_of and ((ttb.date_of - t2.date_of) * 24 * 60) <= 45  and t2.n_marshruta != ttb.n_marshruta and t2.AMOUNT  = 0) > 0
+) tb1
+group by n_marshruta
